@@ -1,0 +1,110 @@
+﻿@model TicTacToe.Service.Models.TicTokToeBoard
+@{
+	ViewData["Title"] = "Home Page";
+}
+<div class="text-center" id="box">
+	<header>
+		<h1>Play Tic Tac Toe</h1>
+	</header>
+	<div id="message"></div>
+	<ul id="gameBoard">
+		<li class="tic" id="0">#</li>
+		<li class="tic" id="1">#</li>
+		<li class="tic" id="2">#</li>
+		<li class="tic" id="3">#</li>
+		<li class="tic" id="4">#</li>
+		<li class="tic" id="5">#</li>
+		<li class="tic" id="6">#</li>
+		<li class="tic" id="7">#</li>
+		<li class="tic" id="8">#</li>
+	</ul>
+	<div class="clearfix"></div>
+	<footer>
+		<button id="reset">Reset</button>
+	</footer>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+	$(function () {
+
+
+		$(document).ready(function () {
+			var turns = ["#", "#", "#", "#", "#", "#", "#", "#"];
+			var computerTurn = "";
+			var turn = "";
+			var gameOn = false;
+			var count = 0;
+			ChooseGamer();
+
+			function ChooseGamer() {
+				var startTurn = prompt("Choose Your Move", "Type X or O").toUpperCase();
+				$.ajax({
+					type: "Get",
+					url: "/Home/ChooseGamer?startTurn=" + startTurn,
+					success: function (data) {
+						$("#message").html("Player " + startTurn + " gets to start!");
+					},
+					failure: function (response) {
+						alert("Sorry. Please type X or O");
+						window.location.reload(true);
+					},
+					error: function (response) {
+						alert("Sorry. Please type X or O");
+						window.location.reload(true);
+					}
+				});
+			}
+
+
+			$(".tic").click(function () {
+				var slot = $(this).attr('id');
+
+
+				$.ajax({
+					type: "Get",
+					url: "/Home/playerTurn?id=" + slot,
+					success: function (response) {
+						$("#" + response.computerturnId).text(response.computerTurn);
+						$("#" + response.id).text(response.turn);
+
+						if (response.gameOn === true) {
+							if (response.isDraw) {
+								alert("It is a Draw!");
+							}
+							else {
+								alert(response.message);
+							}
+							$("#reset").click();
+
+						}
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					},
+					error: function (response) {
+						alert(response.responseText);
+					}
+				});
+			});
+
+
+			$("#reset").click(function () {
+				$.ajax({
+					type: "Get",
+					url: "/Home/Reset",
+					success: function (response) {
+						$(".tic").text("#");
+					},
+					failure: function (response) {
+						alert(response.responseText);
+					},
+					error: function (response) {
+						alert(response.responseText);
+					}
+				});
+			});
+
+		});
+	});
+</script>
